@@ -1,5 +1,6 @@
 package me.mrletsplay.jautoclicker;
 
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,9 @@ import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import me.mrletsplay.jautoclicker.script.ClickerScript;
+import me.mrletsplay.jautoclicker.script.ScriptParsingException;
+
 public class ClickerFrame extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 175078711027490120L;
@@ -24,7 +28,9 @@ public class ClickerFrame extends JFrame implements ActionListener {
 	
 	private JButton
 		startButton,
-		scriptingHelpButton;
+		helpButton,
+		recordActionsButton,
+		runScriptButton;
 	
 	private JSlider
 		percentClickSlider;
@@ -74,11 +80,20 @@ public class ClickerFrame extends JFrame implements ActionListener {
 		percentClickSlider.setBounds(140, 50, 100, 50);
 		add(percentClickSlider);
 		
+		helpButton = new JButton("?");
+		helpButton.setBounds(10, 110, 30, 30);
+		helpButton.addActionListener(this);
+		add(helpButton);
 		
-		scriptingHelpButton = new JButton("?");
-		scriptingHelpButton.setBounds(10, 110, 30, 30);
-		scriptingHelpButton.addActionListener(this);
-		add(scriptingHelpButton);
+		recordActionsButton = new JButton("Record (F7)");
+		recordActionsButton.setBounds(getWidth() - 210, 85, 200, 25);
+		recordActionsButton.addActionListener(this);
+		add(recordActionsButton);
+		
+		runScriptButton = new JButton("Run (F8)");
+		runScriptButton.setBounds(getWidth() - 210, 115, 200, 25);
+		runScriptButton.addActionListener(this);
+		add(runScriptButton);
 		
 		atMousePosButton = new JRadioButton("Click At Mouse Position");
 		atMousePosButton.setBounds(250, 10, 200, 25);
@@ -110,6 +125,7 @@ public class ClickerFrame extends JFrame implements ActionListener {
 		add(posYField);
 		
 		scriptArea = new JTextArea();
+		scriptArea.setFont(new Font("DejaVu Sans Mono", Font.PLAIN, 15));
 		
 		JScrollPane sp = new JScrollPane(scriptArea);
 		sp.setBounds(10, 150, 700, getHeight() - 160 - insets.top);
@@ -121,9 +137,26 @@ public class ClickerFrame extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == startButton) {
-			
-		}else if(e.getSource() == scriptingHelpButton) {
-			JOptionPane.showMessageDialog(this, "Hi!", "Scripting Info", JOptionPane.INFORMATION_MESSAGE);
+			if(JAutoClicker.isRunning()) {
+				JAutoClicker.stop();
+			}else {
+				JAutoClicker.start();
+			}
+		}else if(e.getSource() == helpButton) {
+			JOptionPane.showMessageDialog(this, "Hi!", "Help", JOptionPane.INFORMATION_MESSAGE);
+		}else if(e.getSource() == recordActionsButton) {
+			if(JAutoClicker.isRecording()) {
+				JAutoClicker.stopRecording();
+			}else {
+				JAutoClicker.startRecording();
+			}
+		}else if(e.getSource() == runScriptButton) {
+			try {
+				ClickerScript sc = ClickerScript.parse(getScriptText());
+				sc.execute();
+			}catch(ScriptParsingException ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 	
@@ -142,6 +175,14 @@ public class ClickerFrame extends JFrame implements ActionListener {
 	
 	public boolean isCustomClickPosition() {
 		return customPosButton.isSelected();
+	}
+	
+	public String getScriptText() {
+		return scriptArea.getText();
+	}
+	
+	public void appendScriptText(String str) {
+		scriptArea.append(str);
 	}
 	
 	public int getPosX() {
