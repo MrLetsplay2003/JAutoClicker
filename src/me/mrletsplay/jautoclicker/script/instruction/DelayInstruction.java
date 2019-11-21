@@ -1,17 +1,20 @@
 package me.mrletsplay.jautoclicker.script.instruction;
 
+import me.mrletsplay.jautoclicker.script.ScriptContext;
+import me.mrletsplay.jautoclicker.script.ScriptValue;
+
 public class DelayInstruction implements ScriptInstruction {
 
-	private int delay;
+	private ScriptValue delay;
 
-	public DelayInstruction(int delay) {
+	public DelayInstruction(ScriptValue delay) {
 		this.delay = delay;
 	}
 
 	@Override
-	public void execute() {
+	public void execute(ScriptContext context) {
 		try {
-			Thread.sleep(delay);
+			Thread.sleep(delay.getValue(context));
 		} catch (InterruptedException e) {}
 	}
 

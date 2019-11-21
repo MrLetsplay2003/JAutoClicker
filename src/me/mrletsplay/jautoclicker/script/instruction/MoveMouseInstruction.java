@@ -1,32 +1,21 @@
 package me.mrletsplay.jautoclicker.script.instruction;
 
 import me.mrletsplay.jautoclicker.JAutoClicker;
+import me.mrletsplay.jautoclicker.script.ScriptContext;
+import me.mrletsplay.jautoclicker.script.ScriptValue;
 
 public class MoveMouseInstruction implements ScriptInstruction {
 
-	private String x, y;
+	private ScriptValue x, y;
 	
-	public MoveMouseInstruction(String x, String y) {
+	public MoveMouseInstruction(ScriptValue x, ScriptValue y) {
 		this.x = x;
 		this.y = y;
 	}
 	
 	@Override
-	public void execute() {
-		int fX = 0, fY = 0;
-		if(x.equals("mouse_x")) {
-			fX = JAutoClicker.getMouseX();
-		}else {
-			fX = Integer.parseInt(x);
-		}
-		
-		if(y.equals("mouse_y")) {
-			fY = JAutoClicker.getMouseY();
-		}else {
-			fY = Integer.parseInt(y);
-		}
-		
-		JAutoClicker.moveMouse(fX, fY);
+	public void execute(ScriptContext context) {
+		JAutoClicker.moveMouse(x.getValue(context), y.getValue(context));
 	}
 
 	@Override

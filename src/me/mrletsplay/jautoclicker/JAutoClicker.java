@@ -20,6 +20,7 @@ import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
 
 import me.mrletsplay.jautoclicker.script.ClickerScript;
+import me.mrletsplay.jautoclicker.script.ConstantValue;
 import me.mrletsplay.jautoclicker.script.MouseButton;
 import me.mrletsplay.jautoclicker.script.ScriptParsingException;
 import me.mrletsplay.jautoclicker.script.instruction.ClickInstruction;
@@ -120,9 +121,9 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 	public void nativeMousePressed(NativeMouseEvent nativeEvent) {
 		if(recording) {
 			if(lastRecordingClick != 0) {
-				recordingInstructions.add(new DelayInstruction((int) (System.currentTimeMillis() - lastRecordingClick)));
+				recordingInstructions.add(new DelayInstruction(new ConstantValue((int) (System.currentTimeMillis() - lastRecordingClick))));
 			}
-			recordingInstructions.add(new MoveMouseInstruction("" + getMouseX(), "" + getMouseY()));
+			recordingInstructions.add(new MoveMouseInstruction(new ConstantValue(getMouseX()), new ConstantValue(getMouseY())));
 			
 			MouseButton b = null;
 			switch(nativeEvent.getButton()) {

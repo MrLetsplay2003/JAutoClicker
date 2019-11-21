@@ -5,10 +5,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import me.mrletsplay.jautoclicker.JAutoClicker;
 import me.mrletsplay.jautoclicker.script.instruction.ClickInstruction;
+import me.mrletsplay.jautoclicker.script.instruction.DecrementVariableInstruction;
+import me.mrletsplay.jautoclicker.script.instruction.DefineMarkerInstruction;
 import me.mrletsplay.jautoclicker.script.instruction.DelayInstruction;
+import me.mrletsplay.jautoclicker.script.instruction.GotoIfInstruction;
+import me.mrletsplay.jautoclicker.script.instruction.GotoInstruction;
+import me.mrletsplay.jautoclicker.script.instruction.IncrementVariableInstruction;
 import me.mrletsplay.jautoclicker.script.instruction.MoveMouseInstruction;
 import me.mrletsplay.jautoclicker.script.instruction.ScriptInstruction;
+import me.mrletsplay.jautoclicker.script.instruction.SetVariableInstruction;
 
 public class ClickerScript {
 	
@@ -29,9 +36,7 @@ public class ClickerScript {
 				case "move_mouse":
 				{
 					if(parts.length != 3) throw new ScriptParsingException("move_mouse needs 2 args");
-					if(!isNumber(parts[1])) throw new ScriptParsingException("x needs to be a number");
-					if(!isNumber(parts[2])) throw new ScriptParsingException("y needs to be a number");
-					instrList.add(new MoveMouseInstruction(parts[1], parts[2]));
+					instrList.add(new MoveMouseInstruction(makeNumber(parts[1]), makeNumber(parts[2])));
 					break;
 				}
 				case "click":
@@ -50,30 +55,74 @@ public class ClickerScript {
 				}
 				case "delay":
 				{
-					if(parts.length != 2) throw new ScriptParsingException("click needs 0 args");
-					if(!isNumber(parts[1])) throw new ScriptParsingException("delay needs to be a number");
-					instrList.add(new DelayInstruction(Integer.parseInt(parts[1])));
+					if(parts.length != 2) throw new ScriptParsingException("click needs 1 arg");
+					instrList.add(new DelayInstruction(makeNumber(parts[1])));
+					break;
+				}
+				case ">":
+				{
+					if(parts.length != 2) throw new ScriptParsingException("> needs 1 arg");
+					instrList.add(new DefineMarkerInstruction(parts[1]));
+					break;
+				}
+				case "goto":
+				{
+					if(parts.length != 2) throw new ScriptParsingException("goto needs 1 arg");
+					instrList.add(new GotoInstruction(parts[1]));
+					break;
+				}
+				case "set":
+				{
+					if(parts.length != 3) throw new ScriptParsingException("set needs 2 args");
+					instrList.add(new SetVariableInstruction(parts[1], makeNumber(parts[2])));
+					break;
+				}
+				case "inc":
+				{
+					if(parts.length != 2) throw new ScriptParsingException("inc needs 1 arg");
+					instrList.add(new IncrementVariableInstruction(parts[1]));
+					break;
+				}
+				case "dec":
+				{
+					if(parts.length != 2) throw new ScriptParsingException("dec needs 1 arg");
+					instrList.add(new DecrementVariableInstruction(parts[1]));
+					break;
+				}
+				case "gotoif":
+				{
+					if(parts.length != 3) throw new ScriptParsingException("set needs 2 args");
+					instrList.add(new GotoIfInstruction(parts[1], parts[2]));
 					break;
 				}
 				default:
-					throw new ScriptParsingException("Invalid instruction");
+					throw new ScriptParsingException("Invalid instruction: " + instr);
 			}
 		}
 		return new ClickerScript(instrList);
 	}
 	
-	private static boolean isNumber(String str) {
+	public void step(ScriptContext ctx) {
+		ScriptInstruction ins = instructions.get(ctx.getCurrentInstruction());
+		ctx.setVariable("mouse_x", JAutoClicker.getMouseX());
+		ctx.setVariable("mouse_y", JAutoClicker.getMouseY());
+		ins.execute(ctx);
+		ctx.setCurrentInstruction(ctx.getCurrentInstruction() + 1);
+	}
+	
+	private static ScriptValue makeNumber(String str) {
 		try {
-			Integer.parseInt(str);
-			return true;
+			int val = Integer.parseInt(str);
+			return new ConstantValue(val);
 		}catch(Exception e) {
-			return str.equals("mouse_x") || str.equals("mouse_y");
+			return new VariableValue(str);
 		}
 	}
 	
 	public void execute() {
-		for(ScriptInstruction instr : instructions) {
-			instr.execute();
+		ScriptContext ctx = new ScriptContext();
+		while(ctx.getCurrentInstruction() != instructions.size()) {
+			step(ctx);
 		}
 	}
 	
