@@ -1,7 +1,6 @@
 package me.mrletsplay.jautoclicker.script;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +30,6 @@ public class ClickerScript {
 			instr = instr.trim().toLowerCase();
 			if(instr.isEmpty()) continue;
 			String[] parts = instr.split(" ");
-			System.out.println(">> " + Arrays.toString(parts));
 			switch(parts[0]) {
 				case "move_mouse":
 				{
@@ -106,6 +104,7 @@ public class ClickerScript {
 		ScriptInstruction ins = instructions.get(ctx.getCurrentInstruction());
 		ctx.setVariable("mouse_x", JAutoClicker.getMouseX());
 		ctx.setVariable("mouse_y", JAutoClicker.getMouseY());
+		System.out.println("| " + ins.toScriptText());
 		ins.execute(ctx);
 		ctx.setCurrentInstruction(ctx.getCurrentInstruction() + 1);
 	}
@@ -119,11 +118,15 @@ public class ClickerScript {
 		}
 	}
 	
-	public void execute() {
-		ScriptContext ctx = new ScriptContext();
-		while(ctx.getCurrentInstruction() != instructions.size()) {
-			step(ctx);
-		}
+	public ScriptContext execute() {
+		ScriptContext ctx = new ScriptContext(this);
+		new Thread(() -> {
+			while(!ctx.isExit() && ctx.getCurrentInstruction() != instructions.size()) {
+				step(ctx);
+			}
+			System.out.println("| exit");
+		}, "Script-Runner").start();
+		return ctx;
 	}
 	
 	@Override

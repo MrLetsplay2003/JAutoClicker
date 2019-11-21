@@ -22,6 +22,7 @@ import org.jnativehook.mouse.NativeMouseInputListener;
 import me.mrletsplay.jautoclicker.script.ClickerScript;
 import me.mrletsplay.jautoclicker.script.ConstantValue;
 import me.mrletsplay.jautoclicker.script.MouseButton;
+import me.mrletsplay.jautoclicker.script.ScriptContext;
 import me.mrletsplay.jautoclicker.script.ScriptParsingException;
 import me.mrletsplay.jautoclicker.script.instruction.ClickInstruction;
 import me.mrletsplay.jautoclicker.script.instruction.DelayInstruction;
@@ -37,6 +38,8 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 	private static ClickerFrame clickerFrame;
 	private static Robot robot;
 	private static boolean recording;
+	
+	private ScriptContext runningScript;
 	
 	private static long lastRecordingClick;
 	private static List<ScriptInstruction> recordingInstructions;
@@ -89,11 +92,16 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 				startRecording();
 			}
 		}else if(nativeEvent.getKeyCode() == NativeKeyEvent.VC_F8) {
-			try {
-				ClickerScript sc = ClickerScript.parse(clickerFrame.getScriptText());
-				sc.execute();
-			}catch(ScriptParsingException e) {
-				e.printStackTrace();
+			if(runningScript == null) {
+				try {
+					ClickerScript sc = ClickerScript.parse(clickerFrame.getScriptText());
+					runningScript = sc.execute();
+				}catch(ScriptParsingException e) {
+					e.printStackTrace();
+				}
+			}else {
+				runningScript.setExit(true);
+				runningScript = null;
 			}
 		}else if(nativeEvent.getKeyCode() == NativeKeyEvent.VC_F10) {
 			JOptionPane.showMessageDialog(clickerFrame, "Current Mouse Pos is (" + mouseX + "/" + mouseY + ")");
@@ -242,7 +250,7 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 	
 	public static void stopRecording() {
 		recording = false;
-		clickerFrame.appendScriptText(new ClickerScript(recordingInstructions).toString());
+		clickerFrame.appendScriptText(new ClickerScript(recordingInstructions).toString() + "\n");
 	}
 
 }

@@ -16,9 +16,6 @@ import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import me.mrletsplay.jautoclicker.script.ClickerScript;
-import me.mrletsplay.jautoclicker.script.ScriptParsingException;
-
 public class ClickerFrame extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 175078711027490120L;
@@ -151,12 +148,7 @@ public class ClickerFrame extends JFrame implements ActionListener {
 				JAutoClicker.startRecording();
 			}
 		}else if(e.getSource() == runScriptButton) {
-			try {
-				ClickerScript sc = ClickerScript.parse(getScriptText());
-				sc.execute();
-			}catch(ScriptParsingException ex) {
-				ex.printStackTrace();
-			}
+			
 		}
 	}
 	
