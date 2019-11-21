@@ -6,7 +6,9 @@ import me.mrletsplay.jautoclicker.script.ScriptValue;
 
 public class MoveMouseInstruction implements ScriptInstruction {
 
-	private ScriptValue x, y;
+	private ScriptValue
+		x,
+		y;
 	
 	public MoveMouseInstruction(ScriptValue x, ScriptValue y) {
 		this.x = x;

@@ -11,8 +11,8 @@ public class JAutoClickerMain {
 		JAutoClicker.init();
 		
 		Rectangle r = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds();
-		Coordinates.screenOffsetX = r.x;
-		Coordinates.screenOffsetY = r.y;
+		JAutoClicker.screenOffsetX = r.x;
+		JAutoClicker.screenOffsetY = r.y;
 	}
 
 }

@@ -33,8 +33,13 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 	
 	public static final JAutoClicker INSTANCE = new JAutoClicker();
 	
+	public static int
+		screenOffsetX,
+		screenOffsetY,
+		mouseX,
+		mouseY;
+	
 	private static Thread clickerThread;
-	private static int mouseX, mouseY;
 	private static ClickerFrame clickerFrame;
 	private static Robot robot;
 	private static boolean recording;
@@ -47,7 +52,7 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 	protected static void init() throws NativeHookException {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}catch(UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {};
+		}catch(UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {}
 		
 		clickerFrame = new ClickerFrame();
 		
@@ -69,12 +74,12 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 
 	@Override
 	public void nativeKeyTyped(NativeKeyEvent nativeEvent) {
-		
+		// Unused atm
 	}
 
 	@Override
 	public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
-		
+		// Unused atm
 	}
 
 	@Override
@@ -110,19 +115,19 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 
 	@Override
 	public void nativeMouseMoved(NativeMouseEvent nativeEvent) {
-		mouseX = nativeEvent.getX() + Coordinates.screenOffsetX;
-		mouseY = nativeEvent.getY() + Coordinates.screenOffsetY;
+		mouseX = nativeEvent.getX() + screenOffsetX;
+		mouseY = nativeEvent.getY() + screenOffsetY;
 	}
 
 	@Override
 	public void nativeMouseDragged(NativeMouseEvent nativeEvent) {
-		mouseX = nativeEvent.getX() + Coordinates.screenOffsetX;
-		mouseY = nativeEvent.getY() + Coordinates.screenOffsetY;
+		mouseX = nativeEvent.getX() + screenOffsetX;
+		mouseY = nativeEvent.getY() + screenOffsetY;
 	}
 	
 	@Override
 	public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
-		
+		// Unused atm
 	}
 	
 	@Override
@@ -150,8 +155,9 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 					b = MouseButton.RIGHT;
 					break;
 				}
+				default:
+					return;
 			}
-			if(b == null) return;
 			
 			recordingInstructions.add(new ClickInstruction(b));
 			lastRecordingClick = System.currentTimeMillis();
@@ -160,7 +166,7 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 	
 	@Override
 	public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
-		
+		// Unused atm
 	}
 	
 	public static void moveMouse(int x, int y) {
@@ -199,7 +205,9 @@ public class JAutoClicker implements NativeKeyListener, NativeMouseInputListener
 		
 		boolean customPos = clickerFrame.isCustomClickPosition();
 		
-		int cPosX, cPosY;
+		int
+			cPosX,
+			cPosY;
 		
 		if(customPos) {
 			cPosX = clickerFrame.getPosX();

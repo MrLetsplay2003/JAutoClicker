@@ -4,7 +4,9 @@ import me.mrletsplay.jautoclicker.script.ScriptContext;
 
 public class GotoIfInstruction implements ScriptInstruction {
 	
-	private String name, variable;
+	private String
+		name,
+		variable;
 	
 	public GotoIfInstruction(String name, String variable) {
 		this.name = name;
