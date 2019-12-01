@@ -73,7 +73,7 @@ public class ClickerFrame extends JFrame implements ActionListener {
 		percClickLbl2.setBounds(10, 70, 120, 25);
 		add(percClickLbl2);
 		
-		percentClickSlider = new JSlider(0, 100, 50);
+		percentClickSlider = new JSlider(1, 99, 50);
 		percentClickSlider.setBounds(140, 50, 100, 50);
 		add(percentClickSlider);
 		
